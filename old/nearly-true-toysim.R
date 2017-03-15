@@ -21,7 +21,7 @@ keepnorm<-rbinom(1e7,1,popratio/max(popratio))
 popwrong<-popnorm[keepnorm==1]
 
 
-bestapprox<-replicate(1000,{
+bestapprox<-replicate(10000,{
 	X<-sample(popwrong,10000)
 	R<-rbinom(10000,1,r(X))
 	X[R==0]<-NA
@@ -43,7 +43,7 @@ print(c(epsilon,centering))
 r1<-function(mu) integrate(function(x) (1-r(x))*pdf(x,mu,epsilon),lower=-Inf,upper=Inf,rel.tol=1e-8 )$value
 
 
-replicate(1000,{
+replicate(10000,{
 	X<-sample(popwrong,10000)
 	R<-rbinom(10000,1,r(X))
 	X[R==0]<-NA
@@ -68,7 +68,29 @@ replicate(1000,{
 
 }
 
+epsilons <-c(0.000001,.003,0.006,0.009,0.010,0.011,0.012,0.013,0.015)
+allresults<-lapply(epsilons,one.value)
 
-allresults<-lapply(c(0.000001,.003,0.006,0.009,0.012,0.015),one.value)
+save(epsilons,allresults, file="~/nearlytrue-toy-sim.rda")
 
-save(allresults, file="~/nearlytrue-toy-sim.rda")
+plot(epsilons,sapply(allresults, function(d) (median(d[1,])-median(d[2,]))^2)+sapply(allresults, function(d) mad(d[1,])^2),type="b",xlab="epsilon",ylab="MSE")
+points(epsilons, sapply(allresults, function(d) var(d[2,])), col="red",type="b")
+
+
+## both should be kappa^2
+sapply(allresults, function(d) 2*mean(d["ell1",]-d["ell0",]))
+sapply(allresults, function(d) var(d["ell1",]-d["ell0",]))
+
+kappa<-sapply(allresults, function(d) 2*mean(d["ell1",]-d["ell0",])/sd(d["ell1",]-d["ell0",]))
+
+#power
+powerNP<-pnorm(qnorm(0.95, lower.tail = FALSE)+pmax(0,kappa))
+
+MSEmle<-sapply(allresults, function(d) (median(d[1,])-median(d[2,]))^2)+sapply(allresults, function(d) mad(d[1,])^2)
+MSEipw<-sapply(allresults, function(d) var(d[2,]))
+plot(epsilons,MSEmle*10000,type="b",xlab=expression("Power"~(rho==0.55)),ylab="MSE×n",xaxt="n",ylim=range(0,MSEmle,MSEipw)*10000,lwd=2,col="blue",pch=19)
+points(epsilons, MSEipw*10000, col="sienna",type="b",lwd=2)
+axis(1,at=epsilons,labels=round(powerNP*100))
+
+rho<-sapply(allresults[-1],function(d) cor(d[1,]-d[2,],d[3,]-d[4,]))
+rho

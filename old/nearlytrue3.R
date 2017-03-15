@@ -59,6 +59,9 @@ ctrls<-sample(which(y==0),sum(y))
 yy<-y[c(cases,ctrls)]
 xx<-x[c(cases,ctrls)]
 llr<-sum(dbinom(yy,1,expit(xx*beta1+beta0),log=TRUE))-sum(dbinom(yy,1,expit(logit(mm[c(cases,ctrls)])-log(pi0)),log=TRUE))
+mle<-coef(glm(yy~xx,family=binomial,start=c(beta0,beta1)))[2]
+ipw<-coef(glm(yy~xx,family=binomial,weights=ifelse(yy==1,1,1/pi0),start=c(beta0,beta1)))[2]
+c(llr,mle-ipw)
 }
 
 rval<-replicate(LOTS,one.sim())
