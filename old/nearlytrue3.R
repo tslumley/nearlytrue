@@ -71,3 +71,5 @@ rval<-rbind(rval,replicate(LOTS,two.sim(beta0,beta1)))
 rval
 }
 
+
+results<-lapply(c(0,0.001,0.00125,0.0015,0.00175,0.002),function(eps) sims(eps,1000))
