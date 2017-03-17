@@ -83,3 +83,11 @@ mse<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2+var(d[1,]), var(d[2,])))
  axis(1,at=epsilons,labels=round(100*powers))
  axis(3,at=epsilons,labels=round(100*condpowers))
  mtext(expression("% Power"~(conditional)),side=3,line=2)
+
+## show the worst-case example 
+df<-as.data.frame(lots.sim(epsilons[6])) 
+l<-gam(yy~s(xx),data=df,family=binomial)
+i<-order(df$xx)
+plot(df$xx[i],fitted(l)[i],type="l",lwd=2)
+l0<-glm(yy~xx,data=df,family=binomial)
+abline(l0,lwd=2,lty=2,col="orange")
