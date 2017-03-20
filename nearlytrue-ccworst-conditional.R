@@ -19,7 +19,7 @@ y<-rbinom(POPN, 1, mu)
 keep<-c(which(y==1), sample(which(y==0), 2*sum(y==1)))
 
 X<-cbind(1,x)
-mu1<-expit(x*beta-6-log(pi0))
+mu1<-expit(x*beta-5-log(pi0))
 
 V<- t(X)%*%(mu*(1-mu)*(X))/POPN
 
@@ -86,8 +86,10 @@ mse<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2+var(d[1,]), var(d[2,])))
 
 ## show the worst-case example 
 df<-as.data.frame(lots.sim(epsilons[6])) 
-l<-gam(yy~s(xx),data=df,family=binomial)
+l<-gam(yy~s(xx),data=df,family=binomial,weights=ifelse(yy==1,1,2e5*100/nrow(df)))
 i<-order(df$xx)
-plot(df$xx[i],fitted(l)[i],type="l",lwd=2)
-l0<-glm(yy~xx,data=df,family=binomial)
-abline(l0,lwd=2,lty=2,col="orange")
+plot(df$xx[i],logit(fitted(l)[i]),type="l",lwd=2,xlab="x",ylab="P[Y=1]")
+
+l0s<-glm(yy~xx,data=df,family=quasibinomial,weights=ifelse(yy==1,1,2e5*100/nrow(df)))
+abline(coef(l0s)[1],coef(l0s)[2],lty=2,lwd=2,col="blue")
+

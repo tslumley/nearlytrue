@@ -16,7 +16,7 @@ y<-rbinom(POPN, 1, mu)
 keep<-c(which(y==1), sample(which(y==0), 2*sum(y==1)))
 
 X<-cbind(1,x)
-mu1<-expit(x*beta-6-log(pi0))
+mu1<-expit(x*beta-5-log(pi0))
 
 V<- t(X)%*%(mu*(1-mu)*(X))/POPN
 
@@ -55,8 +55,9 @@ c(coef(m0)[2],coef(m1)[2],llr)
 
 epsilons<-c(0,0.0001,0.00015, 0.0002,0.00023,0.00026,0.0003,0.0004)
 rcc<-lapply(epsilons, one.sim)
+save(epsilons, rcc, beta, "~/nearlytrue-ccworst.rda")
 
-kappa<-sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,])))
+#kappa<-sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,])))
 rho<-sapply(rcc, function(d) cor(d[3,],d[2,]-d[1,]))
 errors<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2, var(d[2,])-var(d[1,])))
 mse<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2+var(d[1,]), var(d[2,])))
