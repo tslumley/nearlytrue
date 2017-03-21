@@ -57,12 +57,13 @@ epsilons<-c(0,0.0001,0.00015, 0.0002,0.00023,0.00026,0.0003,0.0004)
 rcc<-lapply(epsilons, one.sim)
 save(epsilons, rcc, beta, "~/nearlytrue-ccworst.rda")
 
-#kappa<-sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,])))
+kappa<-sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,])))
 rho<-sapply(rcc, function(d) cor(d[3,],d[2,]-d[1,]))
 errors<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2, var(d[2,])-var(d[1,])))
 mse<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2+var(d[1,]), var(d[2,])))
 
 
 matplot(epsilons,t(mse),type="b",lty=1,pch=c(19,1),xlab=expression("% Power"~(rho==0.5)),ylab="MSE",xaxt="n",ylim=range(mse,0) )
-powers<-pnorm(qnorm(0.05)+kappa[1,])
+powers<-pnorm(qnorm(0.05)+kappa[1,]/sqrt(kappa[2,]))
+powers[1]<-0.05
 axis(1,at=epsilons,labels=round(100*powers))

@@ -14,7 +14,7 @@ controls<-sample(which(df$y==0),length(cases))
 sdf<-df[c(cases,controls),]
 sdf$wt<-ifelse(sdf$y==1,1,sum(df$y==0)/length(cases))
 
-m0<-glm(y~x+x2,data=df,family=binomial)
+m0<-glm(y~x+x2,data=sdf,family=binomial)
 m1<-glm(y~x,data=sdf,family=binomial)
 m2<-glm(y~x,data=sdf,family=quasibinomial,weights=wt)
 
@@ -22,7 +22,7 @@ c(coef(summary(m0))[3,3],coef(m1)[2],coef(m2)[2])
 }
 
 
-epsilons<-c(0,.01,.03,.05,.06,.07)
+epsilons<-c(0,.01,.03,.04,.05,.06,.07)
 rr<-lapply(epsilons, function(b) replicate(1000,one.sim(b)))
 errors<-sapply(rr, function(d) c(var(d[3,]),var(d[2,])+(mean(d[3,])-mean(d[2,]))^2))
 

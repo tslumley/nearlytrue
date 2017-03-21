@@ -70,16 +70,17 @@ power.sim<-function(epsilon){
 rcond<-lapply(epsilons, power.sim)
 
 condkappas<-sapply(rcond,function(x) c(mean(x)*2,var(x)))
-condpowers<-pnorm(qnorm(0.05)+condkappas[1,])
+condpowers<-pnorm(qnorm(0.05)+condkappas[1,]/sqrt(condkappas[2,]))
 save(condkappas,condpowers,epsilons,rcond,file="~/nearlytrue-ccworst-conditional.rda")
 
 
 load("~/nearlytrue-ccworst.rda")
-kappa<-sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,])))
+kappa<-pmax(0,sapply(rcc,function(d) c(2*mean(d[3,]),var(d[3,]))))
 errors<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2, var(d[2,])-var(d[1,])))
 mse<-sapply(rcc,function(d) 1000*c(mean(d[1,]-d[2,])^2+var(d[1,]), var(d[2,])))
  matplot(epsilons,t(mse),type="b",lty=1,pch=c(19,1),xlab=expression("% Power"~(list("joint",rho==0.5))),ylab="MSE",xaxt="n",ylim=range(mse,0) )
- powers<-pnorm(qnorm(0.05)+kappa[1,])
+ powers<-pnorm(qnorm(0.05)+kappa[1,]/sqrt(kappa[2,]))
+ powers[1]<-0.05
  axis(1,at=epsilons,labels=round(100*powers))
  axis(3,at=epsilons,labels=round(100*condpowers))
  mtext(expression("% Power"~(conditional)),side=3,line=2)
