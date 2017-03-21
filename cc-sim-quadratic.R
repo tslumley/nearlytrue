@@ -33,7 +33,7 @@ kappa<-sapply(rr, function(d) mean(d[1,]))
 power<-pnorm(qnorm(0.05)+pmax(0,kappa))
 
 
-matplot(epsilons,t(errors)*1000,pch=c(19,1),type="b",lty=1,ylim=range(0,errors*1000),ylab=expression("MSE"%*%1000),xaxt="n",xlab="Power")
+matplot(epsilons,t(errors)*1000,pch=c(1,19),col=c("red","black"),type="b",lty=1,ylim=range(0,errors*1000),ylab=expression("MSE"%*%1000),xaxt="n",xlab="Power")
 axis(1,at=epsilons,labels=round(100*power))
 
 save(epsilons, rr,errors,kappa,power,file="~/nearlytrue-quadratic.rda")
