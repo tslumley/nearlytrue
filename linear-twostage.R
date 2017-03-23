@@ -157,3 +157,6 @@ matplot(epsilons,t(errors)*1000,pch=c(1,19),col=c("red","black"),type="b",lty=1,
 axis(1,at=epsilons,labels=round(100*power))
 
 save(epsilons,rr2,errors,kappa,power,file="~/nearlytrue-lin2stg.rda")
+
+errorht<-sapply(rr2,function(d) var(d[1,]))
+points(epsilons,errorht*1000, pch=1,col="blue",lty=3,type="b")
